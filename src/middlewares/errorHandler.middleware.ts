@@ -1,5 +1,6 @@
 import type { ErrorRequestHandler } from "express";
 import { HTTPSTATUS } from "../config/http.config";
+import { AppError } from "../utils/appError";
 
 export const errorHandler: ErrorRequestHandler = (
 	error,
@@ -16,7 +17,13 @@ export const errorHandler: ErrorRequestHandler = (
         });
     }
 
-    // Erro genérico
+    if (error instanceof AppError) {
+         res.status(HTTPSTATUS.BAD_REQUEST).json({
+            message: error.message,
+            errorCode: error.errorCode,
+        })
+    }
+
      res.status(HTTPSTATUS.INTERNAL_SERVER_ERROR).json({
         message: "Erro interno no servidor",
         error: error?.message || "Ocorreu um erro inesperado, tente novamente mais tarde",

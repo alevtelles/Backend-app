@@ -54,3 +54,29 @@ export class NotFoundException extends AppError {
         )
     }
 }
+
+export class BadRequestException extends AppError {
+    constructor(
+        message = "Requisição inválida",
+        errorCode?: ErrorCodeEnumType,
+    ) {
+        super(
+            message,
+            HTTPSTATUS.BAD_REQUEST,
+            errorCode || ErrorCodeEnum.VALIDATION_ERROR,
+        )
+    }
+}
+
+export class UnauthorizedException extends AppError {
+    constructor(
+        message = "Acesso não autorizado",
+        errorCode?: ErrorCodeEnumType,
+    ) {
+        super(
+            message,
+            HTTPSTATUS.UNAUTHORIZED,
+            errorCode || ErrorCodeEnum.ACCESS_UNAUTHORIZED,
+        )
+    }
+}
