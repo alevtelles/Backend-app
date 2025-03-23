@@ -1,7 +1,5 @@
 import { getEnv } from "../utils/get-env";
 
-console.log("MONGO_URI:", process.env.MONGO_URI); // Adicione esta linha para depuração
-
 const appConfig = () => ({
     NODE_ENV: getEnv("NODE_ENV", "development"),
     PORT: getEnv("PORT", "5000"),
