@@ -19,6 +19,5 @@ export const errorHandler: ErrorRequestHandler = (
      res.status(500).json({
         message: "Erro interno no servidor",
         error: error?.message || "Ocorreu um erro inesperado, tente novamente mais tarde",
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
 };

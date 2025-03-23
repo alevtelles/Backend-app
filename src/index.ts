@@ -35,7 +35,7 @@ app.use(
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
 	res.status(200).json({
-		message: "Olá obrigado por acessar nossa API",
+		message: "Você está acessando nossa API.",
 	});
 });
 
