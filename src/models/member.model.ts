@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
 import { type Document, Schema } from "mongoose";
+import { RolesDocument } from "./roles-permission.model";
 
 export interface MemberDocument extends Document {
     userId: mongoose.Types.ObjectId;
     workspaceId: mongoose.Types.ObjectId;
-    //role: RoleDocument;
+    role: RolesDocument;
     joinedAt: Date;
 }
 
@@ -14,11 +15,11 @@ const memberSchema = new Schema<MemberDocument>({
         ref: 'User',
         required: true
     },
-    // role: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'Role',
-    //     required: true
-    // },
+    role: {
+        type: Schema.Types.ObjectId,
+        ref: 'Role',
+        required: true
+    },
     workspaceId: {
         type: Schema.Types.ObjectId,
         ref: 'Workspace',
