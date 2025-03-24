@@ -1,8 +1,10 @@
-import type mongoose from "mongoose";
+import mongoose from "mongoose";
 import { type Document, Schema } from "mongoose";
-import type {
-	TaskPriorityEnumType,
-	TaskStatusEnumType,
+import {
+    TaskPriorityEnum,
+    TaskStatusEnum,
+	type TaskPriorityEnumType,
+	type TaskStatusEnumType,
 } from "../enums/task.enum";
 import { generateTaskCode } from "../utils/uuid";
 
@@ -47,6 +49,36 @@ const taskSchema = new Schema<TaskDocument>(
             type: Schema.Types.ObjectId,
             ref: "Workspace",
             required: true,
-        }
+        },
+        status: {
+            type: String,
+            enum: Object.values(TaskStatusEnum),
+            default: TaskStatusEnum.TODO
+        },
+        priority:{
+            type: String,
+            enum: Object.values(TaskPriorityEnum),
+            default: TaskPriorityEnum.MEDIUM
+        },
+        assignedTo: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            default: null,
+        },
+        createdBy: {
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        dueDate: {
+            type: Date,
+            default: null,
+        },
+    },
+    {
+        timestamps: true,
     }
 )
+
+const TaskModel = mongoose.model<TaskDocument>("Task", taskSchema);
+export default TaskModel;
