@@ -3,7 +3,7 @@ import { Request } from "express";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { config } from "./app.config"
 import { NotFoundException } from "../utils/appError";
-import { ProviderEneum } from "../enums/account-provider.enum";
+import { ProviderEnum } from "../enums/account-provider.enum";
 import { loginOrCreateAccountSercice } from "../services/auth.service";
 
 passport.use(
@@ -22,18 +22,22 @@ passport.use(
                 throw new NotFoundException("Google ID not found");
             }
             const { user } = await loginOrCreateAccountSercice({
-                provider: ProviderEneum.GOOGLE,
+                provider: ProviderEnum.GOOGLE,
                 displayName: profile.displayName,
                 providerId: googleId,
                 picture: picture,
                 email: email,
             })
+            done(null, user);
+
         } catch(error) {
             done(error, false);
         }
     }
     )
 );
+
+
 
 passport.serializeUser((user: any, done) => done(null, user));
 

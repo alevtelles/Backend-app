@@ -1,6 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
 import { config } from "../config/app.config";
+import { googleLoginCallback } from "../controllers/auth.controller";
 
 const failedUrl = `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`
 
@@ -14,9 +15,11 @@ authRoutes.get(
 );
 
 authRoutes.get(
-    "/google/callback", 
+    "google/callback",
     passport.authenticate("google", {
         failureRedirect: failedUrl,
-    })
-    //googleLoginCallback
+    }),
+    googleLoginCallback
 )
+
+export default authRoutes;

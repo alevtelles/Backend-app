@@ -3,12 +3,12 @@ import { type Document, Schema } from "mongoose";
 import { PermissionType, Permissions, Roles, RoleType } from "../enums/role.enum";
 import { RolePermissions } from "../utils/roles-permission";
 
-export interface RolesDocument extends Document {
+export interface RoleDocument extends Document {
     name: RoleType;
     permissions: Array<PermissionType>;
 }
 
-const roleSchema = new Schema<RolesDocument>({
+const roleSchema = new Schema<RoleDocument>({
     name: {
         type: String,
         enum: Object.values(Roles),
@@ -19,7 +19,7 @@ const roleSchema = new Schema<RolesDocument>({
         type: [String],
         enum: Object.values(Permissions),
         required: true,
-        default: function (this: RolesDocument){
+        default: function (this: RoleDocument){
             return RolePermissions[this.name];
         },
     }
@@ -28,5 +28,5 @@ const roleSchema = new Schema<RolesDocument>({
     { timestamps: true },
 )
 
-const RoleModel = mongoose.model<RolesDocument>('Member', roleSchema);
+const RoleModel = mongoose.model<RoleDocument>('Member', roleSchema);
 export default RoleModel;

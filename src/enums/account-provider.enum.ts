@@ -1,4 +1,4 @@
-export const ProviderEneum = {
+export const ProviderEnum = {
     GOOGLE: "google",
     GITHUB: "github",
     LINKEDIN: "linkedin",
@@ -6,4 +6,4 @@ export const ProviderEneum = {
     FACEBOOK: "facebook",
 }
 
-export type ProviderEnumType = keyof typeof ProviderEneum;
+export type ProviderEnumType = keyof typeof ProviderEnum;
