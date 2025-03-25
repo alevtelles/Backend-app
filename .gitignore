@@ -58,6 +58,8 @@ tsconfig.tsbuildinfo
 *.js
 *.js.map
 *.d.ts
+old.ts
+
 
 # Arquivos de configuração do ts-node-dev
 .ts-node-dev-*

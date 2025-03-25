@@ -35,8 +35,5 @@ const memberSchema = new Schema<MemberDocument>(
   }
 );
 
-// Verifique se o modelo já existe antes de defini-lo
-const MemberModel =
-  mongoose.models.Member || mongoose.model<MemberDocument>("Member", memberSchema);
-
+const MemberModel = mongoose.model<MemberDocument>("Member", memberSchema);
 export default MemberModel;

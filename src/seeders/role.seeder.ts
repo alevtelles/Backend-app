@@ -36,8 +36,10 @@ const seedRoles = async () => {
 
         }
         await session.commitTransaction();
+        console.log("Transaction committed.");
+
         session.endSession();
-        console.log("Session ended")
+        console.log("Session ended.")
 
         console.log("Seeding completed successfully")
 
