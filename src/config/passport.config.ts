@@ -32,7 +32,9 @@ passport.use(
             done(error, false);
         }
     }
+    )
+);
 
-)
+passport.serializeUser((user: any, done) => done(null, user));
 
-)
+passport.deserializeUser((user: any, done) => done(null, user));
