@@ -1,10 +1,12 @@
 import passport from "passport";
 import { Request } from "express";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as LocalStrategy } from "passport-local";
+
 import { config } from "./app.config"
 import { NotFoundException } from "../utils/appError";
 import { ProviderEnum } from "../enums/account-provider.enum";
-import { loginOrCreateAccountService } from "../services/auth.service";
+import { loginOrCreateAccountService, verifyUserService } from "../services/auth.service";
 
 passport.use(
   new GoogleStrategy(
@@ -41,6 +43,29 @@ passport.use(
 
 
 
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: "email",
+      passwordField: "password",
+    },
+    async (email: string, password: string, done: (error: any, user?: any, options?: { message: string }) => void) => {
+      try {
+        const user = await verifyUserService({ email, password });
+        return done(null, user);
+      } catch (error: any) {
+        return done(error, false, { message: error?.message });
+      }
+    }
+  )
+);
+
+
+
 passport.serializeUser((user: any, done) => done(null, user));
 
 passport.deserializeUser((user: any, done) => done(null, user));
+
+function verifyService(arg0: { email: any; password: any; }) {
+  throw new Error("Function not implemented.");
+}

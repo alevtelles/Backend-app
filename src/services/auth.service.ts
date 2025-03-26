@@ -4,8 +4,10 @@ import AccountModel from "../models/account.model";
 import WorkspaceModel from "../models/workspace.model";
 import RoleModel from "../models/roles-permission.model";
 import { Roles } from "../enums/role.enum";
-import { NotFoundException } from "../utils/appError";
+import { BadRequestException, NotFoundException } from "../utils/appError";
 import MemberModel from "../models/member.model";
+import { ProviderEnum } from "../enums/account-provider.enum";
+import { string } from "zod";
 
 export const loginOrCreateAccountService = async (data: {
   provider: string;
@@ -20,7 +22,7 @@ export const loginOrCreateAccountService = async (data: {
 
   try {
     session.startTransaction();
-    console.log("Started Session...");
+    console.log("Iniciando a sessão...");
 
     let user = await UserModel.findOne({ email }).session(session);
 
@@ -42,8 +44,8 @@ export const loginOrCreateAccountService = async (data: {
 
       // 3. Create a new workspace for the new user
       const workspace = new WorkspaceModel({
-        name: `My Workspace`,
-        description: `Workspace created for ${user.name}`,
+        name: `Meu Workspace`,
+        description: `criado com sucesso por: ${user.name}`,
         owner: user._id,
       });
       await workspace.save({ session });
@@ -53,7 +55,7 @@ export const loginOrCreateAccountService = async (data: {
       }).session(session);
 
       if (!ownerRole) {
-        throw new NotFoundException("Owner role not found");
+        throw new NotFoundException("Proprietário não encontrado");
       }
 
       const member = new MemberModel({
@@ -69,7 +71,7 @@ export const loginOrCreateAccountService = async (data: {
     }
     await session.commitTransaction();
     session.endSession();
-    console.log("End Session...");
+    console.log("Finalizando sessão...");
 
     return { user };
   } catch (error) {
@@ -80,3 +82,107 @@ export const loginOrCreateAccountService = async (data: {
     session.endSession();
   }
 };
+
+export const registerUserService = async (body: {
+  email: string;
+  name: string;
+  password: string;
+}) => {
+  const { email, name, password } = body;
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const existingUser = await UserModel.findOne({ email }).session(session);
+    if (existingUser) {
+      throw new BadRequestException("Email já cadastrado.");
+    }
+
+    const user = new UserModel({
+      email,
+      name,
+      password,
+    });
+    await user.save({ session });
+
+    const account = new AccountModel({
+      userId: user._id,
+      provider: ProviderEnum.EMAIL,
+      providerId: email,
+    });
+
+    await account.save({ session });
+
+    // 3. Create a new workspace for the new user
+    const workspace = new WorkspaceModel({
+      name: `Meu Workspace`,
+      description: `Workspace criado com sucesso por: ${user.name}`,
+      owner: user._id,
+    });
+    await workspace.save({ session });
+
+    const ownerRole = await RoleModel.findOne({
+      name: Roles.OWNER,
+    }).session(session);
+
+    if (!ownerRole) {
+      throw new NotFoundException("Proprietário não encontrado");
+    }
+
+    const member = new MemberModel({
+      userId: user._id,
+      workspaceId: workspace._id,
+      role: ownerRole._id,
+      joinedAt: new Date(),
+    });
+    await member.save({ session });
+
+    user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
+    await user.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+    console.log("Finalizando sessão...");
+
+    return { 
+      userId: user._id,
+      workspaceId: workspace._id,
+     };
+
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    
+    throw error;
+  }
+};
+
+
+export const verifyUserService = async ({
+  email,
+  password,
+  provider = ProviderEnum.EMAIL,
+
+}: {
+  email: string;
+  password: string
+  provider?: string;
+}) => {
+  const account = await AccountModel.findOne({ provider,  providerId: email})
+  if(!account) {
+    throw new NotFoundException("Email ou senha inválidos!");
+  }
+
+  const user = await UserModel.findById(account.userId);
+  if(!user) {
+    throw new NotFoundException("Usuário não encontrado!");
+  }
+
+  const isMatch = await user.comparePassword(password);
+  if(!isMatch) {
+    throw new NotFoundException("Email ou senha inválidos!");
+  }
+
+  return user.omitPassword();
+}
