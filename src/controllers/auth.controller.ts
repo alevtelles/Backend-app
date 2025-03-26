@@ -63,3 +63,20 @@ export const loginController = asyncHandler(
   }
 );
 
+export const logOutController = asyncHandler(
+  async (req: Request, res: Response) => {
+    req.logout((err) => {
+      if (err) {
+        console.error("Erro ao fazer login:", err);
+         res
+          .status(HTTPSTATUS.INTERNAL_SERVER_ERROR)
+          .json({ error: "Falha ao efetuar login" });
+      }
+    });
+
+    req.session = null;
+     res
+      .status(HTTPSTATUS.OK)
+      .json({ message: "Desconectado com sucesso" });
+  }
+);
