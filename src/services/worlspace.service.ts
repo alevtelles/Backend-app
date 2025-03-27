@@ -53,23 +53,12 @@ export const createWorkspaceSercive = async (
 
     }
 
-// export const getAllWorkspaceUserIsMemberServices = async (userId: string) => {
-//     const memberships = await MemberModel.find({ userId })
-//     .populate("workspaceId")
-//     .select("-password")
-//     .exec();
-
-//     const workspaces = memberships.map((memberships) => memberships.workspaceId);
-//     return { workspaces };
-// }
-
 export const getAllWorkspacesUserIsMemberService = async (userId: string) => {
   const memberships = await MemberModel.find({ userId })
     .populate("workspaceId")
     .select("-password")
     .exec();
 
-  // Extract workspace details from memberships
   const workspaces = memberships.map((membership) => membership.workspaceId);
 
   return { workspaces };
@@ -97,3 +86,18 @@ export const getWorkspaceByIdService = async (workspaceId: string) => {
     }
     
 }
+
+export const getWorkspaceMembersService = async (workspaceId: string) => {
+
+  const members = await MemberModel.find({
+    workspaceId,
+  })
+    .populate("userId", "name email profilePicture -password")
+    .populate("role", "name");
+
+  const roles = await RoleModel.find({}, { name: 1, _id: 1 })
+    .select("-permission")
+    .lean();
+
+  return { members, roles };
+};
