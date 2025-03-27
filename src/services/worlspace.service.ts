@@ -74,3 +74,26 @@ export const getAllWorkspacesUserIsMemberService = async (userId: string) => {
 
   return { workspaces };
 };
+
+export const getWorkspaceByIdService = async (workspaceId: string) => {
+    const workspace = await WorkspaceModel.findById(workspaceId);
+
+    if (!workspace) {
+        throw new NotFoundException("Workspace não encontrado");
+    }
+
+    const members = await MemberModel.find({
+        workspaceId,
+    
+    }).populate("role");
+
+    const workspaceWhiteMembers = {
+        ...workspace.toObject(),
+        members,
+    }
+
+    return {
+        workspace: workspaceWhiteMembers,
+    }
+    
+}

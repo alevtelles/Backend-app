@@ -8,6 +8,11 @@ export const nameSchema = z
 
 export const descriptionSchema = z.string().trim().optional()
 
+export const workspaceIdSchema = z
+    .string()
+    .trim()
+    .min(1, { message: "ID do workspace é obrigatório" });
+
 export const createWorkspaceSchema = z.object({
     name: nameSchema,
     description: descriptionSchema,
